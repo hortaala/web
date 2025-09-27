@@ -1,0 +1,245 @@
+
+
+
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <title>بلدة حورتعلا</title>
+
+  <link rel="shortcut icon" href="./sowar/sora.jpg" type="image/x-icon" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="description" content="صفحة بلدة حورتعلا - موقع " />
+  <meta name="keywords" content="حورتعلا, بلدة, لبنان, موقع, " />
+  <meta name="author" content="Ali Abdallah Massri" />
+  <!-- Bootstrap RTL -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.rtl.min.css" rel="stylesheet">
+
+  <!-- Axios -->
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
+  <!-- CryptoJS -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+
+  <style>
+    body { background:#f8f9fa; font-family: Arial, Tahoma, "Segoe UI"; }
+    header, footer { background:#0d6efd; color:white; }
+    .note-img { height:180px; object-fit:cover; }
+    .card-min { min-height: 260px; }
+    .social-icons img { width: 30px; height: 30px; margin-left: 10px; }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <header class="py-3">
+    <section class="container my-3 text-center">
+      <div class="alert alert-primary">
+        <strong>التاريخ اليوم:</strong>
+        <span id="dateGregorian"></span> |
+        <span id="dateHijri"></span>
+      </div>
+    </section>
+
+    <div class="container d-flex justify-content-between align-items-center">
+      <div>
+        <h1 class="h4 mb-0">حورتعلا</h1>
+        <small>بلدة - صفحة </small>
+      </div>
+      <nav class="d-flex align-items-center">
+        <button class="btn btn-outline-light btn-sm me-2" onclick="showTab('home')">الرئيسية</button>
+        <button class="btn btn-outline-light btn-sm" onclick="showTab('admin')">لوحة الأدمن</button>
+        <div class="social-icons d-flex align-items-center">
+          <a href="https://www.facebook.com/share/17Af3hLALd/" target="_blank"><img src="https://cdn-icons-png.flaticon.com/512/733/733547.png" alt="Facebook"></a>
+          <a href="https://chat.whatsapp.com/Kw6B60W8uaf1o2Z2Ly8SII?mode=ems_copy_t" target="_blank"><img src="https://cdn-icons-png.flaticon.com/512/733/733585.png" alt="WhatsApp"></a>
+        </div>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Carousel -->
+  <section class="container my-3">
+    <div id="townCarousel" class="carousel slide" data-bs-ride="carousel">
+      <div class="carousel-inner rounded shadow-sm">
+        <div class="carousel-item active">
+          <img src="./sowar/sora.jpg" class="d-block w-100" alt="">
+        </div>
+        <div class="carousel-item">
+          <img src="./sowar/Flag_of_Lebanon.svg.webp" class="d-block w-100" alt="">
+        </div>
+      </div>
+      <button class="carousel-control-prev" type="button" data-bs-target="#townCarousel" data-bs-slide="prev">
+        <span class="carousel-control-prev-icon"></span>
+      </button>
+      <button class="carousel-control-next" type="button" data-bs-target="#townCarousel" data-bs-slide="next">
+        <span class="carousel-control-next-icon"></span>
+      </button>
+    </div>
+  </section>
+
+  <!-- Main content -->
+  <main class="container mb-5">
+    <!-- HOME TAB -->
+    <div id="tab-home">
+      <h3>الملاحظات</h3>
+      <div id="notesContainer" class="row g-3 mb-4"></div>
+
+      <hr>
+      <h3>التقويم</h3>
+      <div id="calendarContainer" class="list-group mb-4"></div>
+    </div>
+
+    <!-- ADMIN TAB -->
+    <div id="tab-admin" style="display:none;">
+      <div id="loginBox" class="card p-3 mb-3">
+        <h5>تسجيل دخول الأدمن</h5>
+        <form id="loginForm" onsubmit="adminLogin(event)">
+          <div class="mb-2">
+            <input id="adminUsername" class="form-control" placeholder="اسم المستخدم" required>
+          </div>
+          <div class="mb-2">
+            <input id="adminPassword" type="password" class="form-control" placeholder="كلمة المرور" required>
+          </div>
+          <button class="btn btn-primary">دخول</button>
+        </form>
+      </div>
+
+      <div id="adminPanel" style="display:none;">
+        <div class="row">
+          <div class="col-md-6">
+            <div class="card p-3 mb-3">
+              <h5>إضافة ملاحظة</h5>
+              <form id="addNoteForm" enctype="multipart/form-data">
+                <div class="mb-2">
+                  <textarea name="text" class="form-control" placeholder="نص الملاحظة" required></textarea>
+                </div>
+                <div class="mb-2">
+                  <input type="file" name="image" accept="image/*" class="form-control" />
+                </div>
+                <div class="mb-2">
+                  <textarea name="secret" class="form-control" placeholder="secret" required></textarea>
+                </div>
+                <button class="btn btn-success">إضافة ملاحظة</button>
+              </form>
+            </div>
+
+            <div class="card p-3 mb-3">
+              <h5>قائمة الملاحظات (حذف)</h5>
+              <div id="adminNotesList"></div>
+            </div>
+          </div>
+
+          <div class="col-md-6">
+            <div class="card p-3 mb-3">
+              <h5>إضافة حدث للتقويم</h5>
+              <form id="addEventForm">
+                <div class="mb-2"><input type="date" name="date" class="form-control" required /></div>
+                <div class="mb-2"><input name="event" class="form-control" placeholder="اسم الحدث" required /></div>
+                <div class="mb-2"><input name="secret" class="form-control" placeholder="secret" required /></div>
+
+                <button class="btn btn-success">إضافة فعالية</button>
+              </form>
+            </div>
+
+            <div class="card p-3 mb-3">
+              <h5>قائمة الفعاليات (حذف)</h5>
+              <div id="adminEventsList"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="py-3 footer-small">
+    <div class="container d-flex justify-content-between">
+      <div>© <script>document.write(new Date().getFullYear());</script> بلدة حورتعلا</div>
+     <a href="https://www.facebook.com/ali.massri.519724/" target="_blank" style="color: white; text-decoration: none;">
+       <div>By Ali Abdallah Massri</div>
+     </a>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    const API_BASE = "https://hortalla.onrender.com/api";
+    // const API_BASE = "http://localhost:5000/api";
+    function showTab(tab) {
+      document.getElementById("tab-home").style.display = tab === "home" ? "block" : "none";
+      document.getElementById("tab-admin").style.display = tab === "admin" ? "block" : "none";
+    }
+
+    async function loadNotes() {
+      const res = await axios.get(`${API_BASE}/notes`);
+      const cont = document.getElementById("notesContainer");
+      const adminList = document.getElementById("adminNotesList");
+      cont.innerHTML = ""; adminList.innerHTML = "";
+      res.data.forEach(n => {
+        const imgHtml = n.imageUrl ? `<img src="${n.imageUrl}" class="card-img-top note-img" alt="img">` : "";
+        cont.innerHTML += `<div class="col-md-4"><div class="card card-min shadow-sm">${imgHtml}<div class="card-body"><p class="card-text">${n.text}</p><small class="text-muted">${new Date(n.createdAt).toLocaleString()}</small></div></div></div>`;
+        adminList.innerHTML += `<div class="d-flex justify-content-between align-items-center border p-2 mb-2"><div><strong>${n.text.substring(0,30)}</strong><br><small>${new Date(n.createdAt).toLocaleString()}</small></div><div><button class="btn btn-sm btn-danger" onclick="deleteNote('${n._id}')">حذف</button></div></div>`;
+      });
+    }
+
+    async function loadCalendar() {
+      const res = await axios.get(`${API_BASE}/calendar`);
+      const cont = document.getElementById("calendarContainer");
+      const adminEvList = document.getElementById("adminEventsList");
+      cont.innerHTML = ""; adminEvList.innerHTML = "";
+      res.data.forEach(ev => {
+        cont.innerHTML += `<div class="list-group-item d-flex justify-content-between"><div>${ev.event}</div><small>${ev.date}</small></div>`;
+        adminEvList.innerHTML += `<div class="d-flex justify-content-between align-items-center border p-2 mb-2"><div><strong>${ev.event}</strong><br><small>${ev.date}</small></div><div><button class="btn btn-sm btn-danger" onclick="deleteEvent('${ev._id}')">حذف</button></div></div>`;
+      });
+    }
+
+    async function adminLogin(e) {
+      e.preventDefault();
+      const u = document.getElementById("adminUsername").value.trim();
+      const p = document.getElementById("adminPassword").value;
+      const userMd5 = CryptoJS.MD5(u).toString();
+      const passMd5 = CryptoJS.MD5(p).toString();
+      const res = await axios.post(`${API_BASE}/admin/login`, { username: userMd5, password: passMd5 });
+      if (res.data.success) {
+        sessionStorage.setItem("isAdmin", "1");
+        document.getElementById("loginBox").style.display = "none";
+        document.getElementById("adminPanel").style.display = "block";
+      } else alert("فشل تسجيل الدخول");
+    }
+
+    document.getElementById("addNoteForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const form = e.target;
+      const fd = new FormData(form);
+      await axios.post(`${API_BASE}/notes`, fd);
+      form.reset();
+      loadNotes();
+    });
+
+    document.getElementById("addEventForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      await axios.post(`${API_BASE}/calendar`, { date: e.target.date.value, event: e.target.event.value, secret: e.target.secret.value });
+      e.target.reset();
+      loadCalendar();
+    });
+
+    async function deleteNote(id) { if (confirm("هل تريد حذف الملاحظة؟")) { await axios.delete(`${API_BASE}/notes/${id}`); loadNotes(); }}
+    async function deleteEvent(id) { if (confirm("هل تريد حذف الفعالية؟")) { await axios.delete(`${API_BASE}/calendar/${id}`); loadCalendar(); }}
+
+    showTab('home');
+    loadNotes();
+    loadCalendar();
+
+    function updateDates() {
+      const today = new Date();
+      const optionsGregorian = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+      document.getElementById("dateGregorian").textContent = today.toLocaleDateString('ar-EG', optionsGregorian);
+      try {
+        document.getElementById("dateHijri").textContent = new Intl.DateTimeFormat('ar-SA-u-ca-islamic', optionsGregorian).format(today);
+      } catch { document.getElementById("dateHijri").textContent = "التاريخ الهجري غير مدعوم"; }
+    }
+    updateDates();
+  </script>
+</body>
+</html>
