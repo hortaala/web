@@ -27,6 +27,11 @@
     .note-img { height:180px; object-fit:cover; }
     .card-min { min-height: 260px; }
     .social-icons img { width: 30px; height: 30px; margin-left: 10px; }
+    #images{
+      height: 100%;
+      width: 100%;
+      object-fit: cover;
+    }
   </style>
 </head>
 <body>
@@ -177,7 +182,7 @@
       const adminList = document.getElementById("adminNotesList");
       cont.innerHTML = ""; adminList.innerHTML = "";
       res.data.forEach(n => {
-        const imgHtml = n.imageUrl ? `<img src="${n.imageUrl}" class="card-img-top note-img" alt="img">` : "";
+        const imgHtml = n.imageUrl ? `<img id="images" src="${n.imageUrl}" class="card-img-top note-img" alt="img">` : "";
         cont.innerHTML += `<div class="col-md-4"><div class="card card-min shadow-sm">${imgHtml}<div class="card-body"><p class="card-text">${n.text}</p><small class="text-muted">${new Date(n.createdAt).toLocaleString()}</small></div></div></div>`;
         adminList.innerHTML += `<div class="d-flex justify-content-between align-items-center border p-2 mb-2"><div><strong>${n.text.substring(0,30)}</strong><br><small>${new Date(n.createdAt).toLocaleString()}</small></div><div><button class="btn btn-sm btn-danger" onclick="deleteNote('${n._id}')">حذف</button></div></div>`;
       });
